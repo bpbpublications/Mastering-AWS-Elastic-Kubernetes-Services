@@ -1,0 +1,27 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: cluster-demo
+  region: us-east-1
+
+AvailabilityZones: ["us-east-1a", "us-east-1b", "us-east-1c"]
+
+managedNodeGroups:
+- name: nodegroup1
+  desiredCapacity: 4
+  instanceType: m5.large
+  volumeSize: 80
+  volumeType: gp3
+  iam:
+    withAddonPolicies:
+      imageBuilder: true
+      autoScaler: true
+
+- name: nodegroup2  
+  desiredCapacity: 2
+  instanceType: c5.large
+  privateNetworking: true
+  iam:
+    withAddonPolicies:
+      externalDNS: true   

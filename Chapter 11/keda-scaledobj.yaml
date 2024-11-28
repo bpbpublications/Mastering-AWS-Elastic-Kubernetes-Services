@@ -1,0 +1,17 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: consumer-scalable
+spec:
+  scaleTargetRef:  
+    deploymentName: consumer
+  pollingInterval: 30  
+  cooldownPeriod:  300
+  maxReplicaCount: 30  
+  triggers:
+    - type: redis  
+      metadata:
+        host: redishost
+        port: 6379
+        listName: jobs-to-process  
+        queueLength: “20"

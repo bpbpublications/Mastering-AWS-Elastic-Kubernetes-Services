@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+     kind: Deployment
+     metadata:
+       name: your-app
+     spec:
+       replicas: 3
+       template:
+         metadata:
+           labels:
+             app: your-app
+         spec:
+           containers:
+           - name: your-app-container
+             image: your-app-image
+             env:
+             - name: DATABASE_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: rds-credentials
+                   key: host
+             - name: DATABASE_USERNAME
+               valueFrom:
+                 secretKeyRef:
+                   name: rds-credentials
+                   key: username
+             - name: DATABASE_PASSWORD
+               valueFrom:
+                 secretKeyRef:
+                   name: rds-credentials
+                   key: password

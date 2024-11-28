@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trino-coordinator
+  namespace: trino
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trino-coordinator
+  template:
+    metadata:
+      labels:
+        app: trino-coordinator
+    spec:
+      containers:
+      - name: trino-coordinator
+        image: trinodb/trino:latest
+        command: ["bin/launcher", "run"]
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: config
+          mountPath: /docker/cluster
+      volumes:
+      - name: config
+        emptyDir: {}

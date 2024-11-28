@@ -1,0 +1,18 @@
+# Apply StorageClass manifest 
+kubectl apply -f storageclass.yaml
+
+# Apply StatefulSet manifest 
+kubectl apply -f statefulset.yaml
+
+#Verify deployment 
+kubectl get statefulsets,pods,pvc
+
+
+#Apply StorageClass csi manifest with the following command:
+kubectl apply -f storageclass_csi.yaml
+
+# Apply StatefulSet manifest with the following command:
+kubectl apply -f statefulset_csi.yaml
+
+# Verify deployment with the following command:
+kubectl get statefulsets,pods,pvc

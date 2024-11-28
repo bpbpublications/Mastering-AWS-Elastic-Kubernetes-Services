@@ -1,0 +1,8 @@
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: mysql-volume-snap
+spec:
+  volumeSnapshotClassName: aws-ebs 
+  source:
+    persistentVolumeClaimName: mysql-pv-claim

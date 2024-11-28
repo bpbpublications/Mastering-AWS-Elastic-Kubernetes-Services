@@ -1,0 +1,83 @@
+{
+    "pipeline": {
+      "name": "YourCodePipelineName",
+      "roleArn": "arn:aws:iam::your-account-id:role/service-role/AWS-CodePipeline-Service",
+      "stages": [
+        {
+          "name": "Source",
+          "actions": [
+            {
+              "name": "SourceAction",
+              "actionTypeId": {
+                "category": "Source",
+                "owner": "AWS",
+                "provider": "CodeCommit",
+                "version": "1"
+              },
+              "configuration": {
+                "RepositoryName": "YourCodeCommitRepo",
+                "BranchName": "main"
+              },
+              "outputArtifacts": [
+                {
+                  "name": "SourceOutput"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Build",
+          "actions": [
+            {
+              "name": "BuildAction",
+              "actionTypeId": {
+                "category": "Build",
+                "owner": "AWS",
+                "provider": "CodeBuild",
+                "version": "1"
+              },
+              "configuration": {
+                "ProjectName": "YourCodeBuildProject"
+              },
+              "outputArtifacts": [
+                {
+                  "name": "BuildOutput"
+                }
+              ],
+              "inputArtifacts": [
+                {
+                  "name": "SourceOutput"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Deploy",
+          "actions": [
+            {
+              "name": "DeployAction",
+              "actionTypeId": {
+                "category": "Deploy",
+                "owner": "AWS",
+                "provider": "ECS",
+                "version": "1"
+              },
+              "configuration": {
+                "ClusterName": "YourEKSCluster",
+                "ServiceName": "YourECSService",
+                "FileName": "imagedefinitions.json"
+              },
+              "inputArtifacts": [
+                {
+                  "name": "BuildOutput"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+  

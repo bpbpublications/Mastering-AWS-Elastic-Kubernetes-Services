@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ns1
+---
+apiVersion: ray.io/v1alpha1
+kind: RayService
+metadata:
+  name: ns1
+  namespace: ns1
+spec:
+  serviceUnhealthySecondThreshold: 600
+  deploymentUnhealthySecondThreshold: 600
+  serveConfig:
+    importPath: dogbooth:entrypoint
+    runtimeEnv: |
+      env_vars: {"MODEL_ID": "sguruvar/dogbooth"}
+  rayClusterConfig:
+    rayVersion: '2.6.0'
+    headGroupSpec:
+      rayStartParams:
+        dashboard-host: '0.0.0.0'
+      template:
+        spec:
+          containers:
+            - name: ray-head
+              image: public.ecr.aws/h5u5m2y7/dogbooth:0.0.1-gpu
+              resources:
+                limits:
+                  cpu: 2
+                  memory: 16Gi
+                  nvidia.com/gpu: 1
+                requests:
+                  cpu: 2
+                  memory: 16Gi
+                  nvidia.com/gpu: 1
+              ports:
+                - containerPort: 6379
+                  name: gcs-server
+                - containerPort: 8265
+                  name: dashboard
+                - containerPort: 10001
+                  name: client
+                - containerPort: 8000
+                  name: serve
+    workerGroupSpecs:
+      - replicas: 1
+        minReplicas: 1
+        maxReplicas: 5
+        rayStartParams: {}
+        groupName: small-group
+        template:
+          spec:
+            containers:
+              - name: ray-worker
+                image: public.ecr.aws/h3o5n2r0/dogbooth:0.0.1-gpu
+                lifecycle:
+                  preStop:
+                    exec:
+                      command: ["/bin/sh","-c","ray stop"]
+                resources:
+                  limits:
+                    cpu: "2"
+                    memory: "16Gi"
+                    nvidia.com/gpu: 1
+                  requests:
+                    cpu: "2"
+                    memory: "16Gi"
+                    nvidia.com/gpu: 1

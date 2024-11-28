@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: adot
+  labels:
+    name: adot
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: adot-collector-conf
+  namespace: adot
+  labels:
+    app: aws-adot
+    component: adot-collector-conf
+data:
+  adot-collector-config: |
+    receivers:
+      prometheus:
+        config:
+          global:
+            scrape_interval: 15s
+            scrape_timeout: 10s
+          scrape_configs:
+          - job_name: gpu-metrics
+            scrape_interval: 1s
+            metrics_path: /metrics
+            scheme: http
+            kubernetes_sd_configs:
+            - role: endpoints
+              namespaces:
+                names:
+                - default
+            relabel_configs:
+            - source_labels: [__meta_kubernetes_pod_node_name]
+              action: replace
+              target_label: kubernetes_node
+          - job_name: 'kubernetes-service-endpoints'
+            kubernetes_sd_configs:
+            - role: endpoints
+            tls_config:
+              ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+              insecure_skip_verify: true
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            relabel_configs:
+            - source_labels: [__meta_kubernetes_service_annotation_scrape]
+              action: keep
+              regex: true
+    exporters:
+      prometheusremotewrite:
+        # replace this with your endpoint
+        endpoint: $REMOTE_WRITE_URL
+        auth:
+          authenticator: sigv4auth
+      logging:
+        loglevel: debug
+    extensions:
+      health_check:
+      pprof:
+        endpoint: :1888
+      zpages:
+        endpoint: :55679
+      # replace this with your region
+      sigv4auth:
+        region: us-west-2
+    service:
+      extensions: [pprof, zpages, health_check, sigv4auth]
+      pipelines:
+        metrics:
+          receivers: [prometheus]
+          exporters: [logging, prometheusremotewrite]

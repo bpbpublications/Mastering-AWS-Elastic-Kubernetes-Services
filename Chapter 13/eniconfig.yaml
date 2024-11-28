@@ -1,0 +1,9 @@
+apiVersion: crd.k8s.amazon.com/v1alpha1
+kind: ENIConfig
+metadata:
+  name: eniconfig    
+spec:
+  securityGroups:
+    - sg-eks-pods
+  subnet: subnet-0ecac748
+  vpcId: vpc-abcd12345

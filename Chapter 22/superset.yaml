@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: superset
+  namespace: superset
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: superset
+  template:
+    metadata:
+      labels:
+        app: superset
+    spec:
+      containers:
+      - name: superset
+        image: apache/superset:latest
+        ports:
+        - containerPort: 8088
+        env:
+        - name: MAPBOX_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: superset-secrets
+              key: mapbox-api-key
+        volumeMounts:
+        - name: superset-data
+          mountPath: /app/superset_home
+      volumes:
+      - name: superset-data
+        emptyDir: {}

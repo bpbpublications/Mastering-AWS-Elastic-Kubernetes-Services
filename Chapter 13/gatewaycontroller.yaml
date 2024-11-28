@@ -1,0 +1,6 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2 
+kind: GatewayClass
+metadata:
+  name: lattice-gw
+spec:
+  controller: “lattice.services.k8s.aws/lattice-loadbalancer"

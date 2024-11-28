@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trino-workers
+  namespace: trino
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: trino-workers
+  template:
+    metadata:
+      labels:
+        app: trino-workers
+    spec:
+      containers:
+      - name: trino-worker
+        image: trinodb/trino:latest
+        command: ["bin/launcher", "run"]
+        env:
+        - name: TRINO_COORDINATOR
+          value: trino-coordinator
